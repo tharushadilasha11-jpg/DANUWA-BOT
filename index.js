@@ -75,6 +75,17 @@ async function connectToWA() {
 
       if (action === 'add') {
         for (const userId of participants) {
+          if (global.antiFakeGroups?.[groupId]) {
+            const number = userId.split('@')[0];
+            if (!number.startsWith("94")) { // Block users not starting with +94 (Sri Lanka)
+              await conn.sendMessage(groupId, {
+                text: `📵 @${number} removed — only Sri Lankan numbers allowed.`,
+                mentions: [userId]
+              });
+              await conn.groupParticipantsUpdate(groupId, [userId], "remove");
+              continue;
+            }
+          }
           const number = userId.split('@')[0];
           const message = `🗯️ *WELCOME TO ${groupName}, @${number}!* ❤‍🩹\n\nWe’re delighted to have you join our community.\n\n✅ Please take a moment to read the group rules and feel free to introduce yourself.\n\n💎 *Let’s build a friendly and respectful environment together!*`;
 
@@ -227,6 +238,7 @@ async function connectToWA() {
 
     const senderNumber = sender.split('@')[0];
     const isGroup = from.endsWith('@g.us');
+
     const botNumber = conn.user.id.split(':')[0];
     const pushname = mek.pushName || 'Sin Nombre';
     const isMe = botNumber.includes(senderNumber);
@@ -247,6 +259,24 @@ async function connectToWA() {
 
     const isAdmins = groupAdmins.includes(senderId);
     const isBotAdmins = groupAdmins.includes(botId);
+
+    if (isGroup && global.antiLinkGroups?.[from] && !isAdmins && /(https?:\/\/[^\s]+)/i.test(body)) {
+      await conn.sendMessage(from, {
+        text: `🚫 Link detected!\n@${senderNumber} has been removed from *${groupName}*!`,
+        mentions: [sender]
+      });
+      await conn.groupParticipantsUpdate(from, [sender], "remove");
+    }
+    const badwords = ["fuck", "shit", "idiot", "bitch", "puka", "උඹ", "කැරියා", "හුත්තා" ,"පකයා", "හුකන්නා", "පොන්නයා"];
+    if (isGroup && global.antiBadwordGroups?.[from] && !isAdmins) {
+      if (badwords.some(word => body.toLowerCase().includes(word))) {
+        await conn.sendMessage(from, {
+          text: `🧼 Bad word detected!\n@${senderNumber} has been removed from *${groupName}*!`,
+          mentions: [sender]
+        });
+        await conn.groupParticipantsUpdate(from, [sender], "remove");
+      }
+    }
 
     // Reply helper
     const reply = (text, options = {}) => conn.sendMessage(from, { text, ...options }, { quoted: mek });
