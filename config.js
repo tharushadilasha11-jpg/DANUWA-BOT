@@ -19,8 +19,8 @@ const defaultConfig = {
   GEMINI_API_KEY: "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", // Add Gemini API key here
   REMOVE_BG_API_KEY:"", // Add removebg API key here
   WEATHER_API_KEY: "", // Add your weather API key here
-  BOT_OWNER: "94776121326", // Replace your bot owner number here with 94(country code)
-  ownerNumber: ["94776121326"], // Replace your bot owner number here (same as bot owner number)
+  BOT_OWNER: "94769928013", // Replace your bot owner number here with 94(country code)
+  ownerNumber: ["94769928013"], // Replace your bot owner number here (same as bot owner number)
   AUTO_STATUS_REACT: "true",
   AUTO_STATUS_REPLY: "true",
   AUTO_STATUS_SEEN: "true",
